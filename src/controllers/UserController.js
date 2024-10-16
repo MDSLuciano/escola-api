@@ -3,9 +3,9 @@ import User from "../models/User"
 class UserController {
   async store(req, res) {
     try{
-      const novoUser = await User.create(req.body)
-      res.json(novoUser)
-
+      const novoUser = await User.create(req.body);
+      const { id, nome, email } = novoUser
+      res.json({ id, nome, email });
     } catch(e){
         res.status(400).json({
           errors: e.errors.map(erro => erro.message),//pega todos os erros e coloca em um objeto contendo um array de erros
@@ -16,7 +16,7 @@ class UserController {
   // Index
   async index(req, res) {
     try{
-      const users = await User.findAll();
+      const users = await User.findAll({ attributes: ['id','nome', 'email'] });
       res.json(users)
     }catch(e){
       return res.json(null)
@@ -26,7 +26,9 @@ class UserController {
   async show(req, res) {
     try{
       const user = await User.findByPk(req.params.id);//Isso procura a Primary Key (id)
-      res.json(user)
+      
+      const { id, nome, email } = user
+      res.json({ id, nome, email})
     }catch(e){
       return res.json(null)
     }
@@ -35,11 +37,8 @@ class UserController {
   // Update
   async update(req, res) {
     try{
-      if(!req.params.id){
-        return res.status(400).json({errors: ["ID não enviado"]})
-      }
 
-      const user = await User.findByPk(req.params.id);//Isso procura a Primary Key (id)
+      const user = await User.findByPk(req.userId);//Isso procura a Primary Key (id)
 
       if(!user){
         return res.status(400).json({
@@ -48,8 +47,8 @@ class UserController {
       }
 
       const novosDados = await user.update(req.body)
-
-      res.json(novosDados)
+      const { id, nome, email } = novosDados
+      res.json({ id, nome, email })
     }catch(e){
       res.status(400).json({
         errors: e.errors.map(erro => erro.message),//pega todos os erros e coloca em um objeto contendo um array de erros
@@ -59,11 +58,8 @@ class UserController {
   // Delete
   async delete(req, res) {
     try{
-      if(!req.params.id){
-        return res.status(400).json({errors: ["ID não enviado"]})
-      }
 
-      const user = await User.findByPk(req.params.id);//Isso procura a Primary Key (id)
+      const user = await User.findByPk(req.userId);//Isso procura a Primary Key (id)
 
       if(!user){
         return res.status(400).json({
@@ -71,7 +67,7 @@ class UserController {
         })
       }
       await user.destroy()
-      res.json(user)
+      res.json(null)
     }catch(e){
       res.status(400).json({
         errors: e.errors.map(erro => erro.message),//pega todos os erros e coloca em um objeto contendo um array de erros
