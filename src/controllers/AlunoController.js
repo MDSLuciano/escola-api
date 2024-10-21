@@ -1,8 +1,16 @@
 import Aluno from "../models/Aluno";
+import Photo from "../models/Photo";
 
 class AlunoController {
   async index(req, res) {
-    const alunos = await Aluno.findAll();
+    const alunos = await Aluno.findAll({
+      attributes: ["id","nome","sobrenome", "email","idade","peso", "altura",],
+      order: [['id', 'DESC'], [Photo, 'id', 'DESC']],
+      include: {
+        model: Photo,
+        attributes: ['filename'],
+      }
+    });
     res.json(alunos)
   }
 
@@ -30,7 +38,14 @@ class AlunoController {
         })
       }
 
-      const aluno = await Aluno.findByPk(id)
+      const aluno = await Aluno.findByPk(id, {
+        attributes: ["id","nome","sobrenome", "email","idade","peso", "altura",],
+        order: [['id', 'DESC'], [Photo, 'id', 'DESC']],
+        include: {
+          model: Photo,
+          attributes: ['filename'],
+        }
+      });
 
       if(!aluno) {
         if(!id){
@@ -38,9 +53,9 @@ class AlunoController {
             errors: ["Student does not exist"],
           })
         }
-      }
+      };
 
-      return res.json(aluno)
+      return res.json(aluno);
 
     }catch(e){
       return res.status(400).json({
@@ -57,9 +72,9 @@ class AlunoController {
         return res.status(400).json({
           errors: ["Missing ID"]
         })
-      }
+      };
 
-      const aluno = await Aluno.findByPk(id)
+      const aluno = await Aluno.findByPk(id);
 
       if(!aluno) {
         if(!id){
@@ -67,11 +82,11 @@ class AlunoController {
             errors: ["Student does not exist"],
           })
         }
-      }
+      };
 
-      await aluno.destroy()
+      await aluno.destroy();
 
-      return res.json({ deleted: true })
+      return res.json({ deleted: true });
 
     }catch(e){
       if (e.errors && Array.isArray(e.errors)) {
