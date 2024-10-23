@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import { resolve } from 'path'
 dotenv.config()
 
 import './src/database';
@@ -21,6 +22,7 @@ class App{
   middlewares(){
     this.app.use(expresss.urlencoded({ extended: true}));
     this.app.use(expresss.json())
+    this.app.use(expresss.static(resolve(__dirname, 'uploads')))
   }
 
   routes(){
